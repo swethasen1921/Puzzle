@@ -2,16 +2,16 @@
 <html lang="en">
 
 <head>
-    <title>Document</title>
+    <title>Puzzle</title>
     <style>
         .master {
             width: 500px;
             height: 450px;
             background-size: 500px 500px;
-            background-blend-mode: lighten;
             display: flex;
             flex-wrap: wrap;
-            gap: 0
+            gap: 0;
+            border: 2px solid black;
         }
 
         .master>div {
@@ -24,39 +24,20 @@
         img {
             height: 150px;
             width: 150px;
+            touch-action: none; /* IMPORTANT for mobile drag */
+        }
+
+        .floating {
+            position: absolute !important;
+            z-index: 9999 !important;
+            pointer-events: none;
         }
     </style>
-    <script>
-        let win = ['1.jpg', '2.jpg', '3.jpg', '4.jpg', '5.jpg', '6.jpg', '7.jpg', '8.jpg', '9.jpg']
 
-        let card = document.querySelectorAll('.division');
-        function allow(ev) {
-            ev.preventDefault();
-        }
-        function copy(ev) {
-            ev.dataTransfer.setData('puzzle', ev.target.id)
-        }
-
-        function accept(ev, a) {
-
-            ev.preventDefault();
-            var box = ev.currentTarget;
-
-            if (box.querySelector('img')) {
-                return;
-            }
-            let s = document.getElementById(ev.dataTransfer.getData('puzzle'));
-            box.appendChild(s);
-            let pos = s.src.split("/")[3];
-            s.draggable = (win[a] == pos) ? false : true;
-
-        }
-
-
-    </script>
 </head>
 
 <body>
+
     <div class="master">
         <div class="division" ondragover="allow(event)" ondrop="accept(event,0)"></div>
         <div class="division" ondragover="allow(event)" ondrop="accept(event,1)"></div>
@@ -69,15 +50,91 @@
         <div class="division" ondragover="allow(event)" ondrop="accept(event,8)"></div>
     </div>
 
-    <img id="img1" class="imggg" draggable="true" ondragstart="copy(event)" src="1.jpg" alt="">
-    <img id="img2" class="imggg" draggable="true" ondragstart="copy(event)" src="2.jpg" alt="">
-    <img id="img3" class="imggg" draggable="true" ondragstart="copy(event)" src="3.jpg" alt="">
-    <img id="img4" class="imggg" draggable="true" ondragstart="copy(event)" src="4.jpg" alt="">
-    <img id="img5" class="imggg" draggable="true" ondragstart="copy(event)" src="5.jpg" alt="">
-    <img id="img6" class="imggg" draggable="true" ondragstart="copy(event)" src="6.jpg" alt="">
-    <img id="img7" class="imggg" draggable="true" ondragstart="copy(event)" src="7.jpg" alt="">
-    <img id="img8" class="imggg" draggable="true" ondragstart="copy(event)" src="8.jpg" alt="">
-    <img id="img9" class="imggg" draggable="true" ondragstart="copy(event)" src="9.jpg" alt="">
+    <br>
+
+    <!-- Puzzle images -->
+    <img id="img1" class="imggg" draggable="true" ondragstart="copy(event)" src="1.jpg">
+    <img id="img2" class="imggg" draggable="true" ondragstart="copy(event)" src="2.jpg">
+    <img id="img3" class="imggg" draggable="true" ondragstart="copy(event)" src="3.jpg">
+    <img id="img4" class="imggg" draggable="true" ondragstart="copy(event)" src="4.jpg">
+    <img id="img5" class="imggg" draggable="true" ondragstart="copy(event)" src="5.jpg">
+    <img id="img6" class="imggg" draggable="true" ondragstart="copy(event)" src="6.jpg">
+    <img id="img7" class="imggg" draggable="true" ondragstart="copy(event)" src="7.jpg">
+    <img id="img8" class="imggg" draggable="true" ondragstart="copy(event)" src="8.jpg">
+    <img id="img9" class="imggg" draggable="true" ondragstart="copy(event)" src="9.jpg">
+
+    <script>
+        /* ---------- DESKTOP DRAG SUPPORT ---------- */
+        let win = ['1.jpg', '2.jpg', '3.jpg', '4.jpg', '5.jpg', '6.jpg', '7.jpg', '8.jpg', '9.jpg'];
+
+        function allow(ev) { ev.preventDefault(); }
+
+        function copy(ev) {
+            ev.dataTransfer.setData('puzzle', ev.target.id);
+        }
+
+        function accept(ev, a) {
+            ev.preventDefault();
+            var box = ev.currentTarget;
+
+            if (box.querySelector('img')) return;
+
+            let s = document.getElementById(ev.dataTransfer.getData('puzzle'));
+            box.appendChild(s);
+
+            let pos = s.src.split("/").pop();
+            s.draggable = (win[a] == pos) ? false : true;
+        }
+
+        /* ---------- MOBILE TOUCH DRAG SUPPORT ---------- */
+
+        function enableTouchDrag(img) {
+
+            let active = false;
+            let offsetX = 0, offsetY = 0;
+
+            img.addEventListener("touchstart", e => {
+                active = true;
+
+                const rect = img.getBoundingClientRect();
+                offsetX = e.touches[0].clientX - rect.left;
+                offsetY = e.touches[0].clientY - rect.top;
+
+                img.classList.add("floating");
+            });
+
+            img.addEventListener("touchmove", e => {
+                if (!active) return;
+                e.preventDefault();
+
+                let x = e.touches[0].clientX - offsetX;
+                let y = e.touches[0].clientY - offsetY;
+
+                img.style.left = x + "px";
+                img.style.top = y + "px";
+            });
+
+            img.addEventListener("touchend", e => {
+                active = false;
+
+                const touch = e.changedTouches[0];
+                const dropTarget = document.elementFromPoint(touch.clientX, touch.clientY);
+
+                img.classList.remove("floating");
+                img.style.left = "";
+                img.style.top = "";
+
+                if (dropTarget && dropTarget.classList.contains("division")) {
+
+                    if (!dropTarget.querySelector("img")) {
+                        dropTarget.appendChild(img);
+                    }
+                }
+            });
+        }
+
+        document.querySelectorAll(".imggg").forEach(enableTouchDrag);
+    </script>
 
 </body>
 
