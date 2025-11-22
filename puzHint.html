@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Document</title>
+    <style>
+        .master {
+            width: 500px;
+            height: 450px;
+            background-size: 500px 500px;
+            background-blend-mode: lighten;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0
+        }
+
+        .master>div {
+            width: 150px;
+            height: 150px;
+            border: 1px solid rgb(0, 0, 0);
+            vertical-align: top;
+        }
+
+        img {
+            height: 150px;
+            width: 150px;
+        }
+    </style>
+    <script>
+        let win = ['1.jpg', '2.jpg', '3.jpg', '4.jpg', '5.jpg', '6.jpg', '7.jpg', '8.jpg', '9.jpg']
+
+        let card = document.querySelectorAll('.division');
+        function allow(ev) {
+            ev.preventDefault();
+        }
+        function copy(ev) {
+            ev.dataTransfer.setData('puzzle', ev.target.id)
+        }
+
+        function accept(ev, a) {
+
+            ev.preventDefault();
+            var box = ev.currentTarget;
+
+            if (box.querySelector('img')) {
+                return;
+            }
+            let s = document.getElementById(ev.dataTransfer.getData('puzzle'));
+            box.appendChild(s);
+            let pos = s.src.split("/")[3];
+            s.draggable = (win[a] == pos) ? false : true;
+
+        }
+
+
+    </script>
+</head>
+
+<body>
+    <div class="master">
+        <div class="division" ondragover="allow(event)" ondrop="accept(event,0)"></div>
+        <div class="division" ondragover="allow(event)" ondrop="accept(event,1)"></div>
+        <div class="division" ondragover="allow(event)" ondrop="accept(event,2)"></div>
+        <div class="division" ondragover="allow(event)" ondrop="accept(event,3)"></div>
+        <div class="division" ondragover="allow(event)" ondrop="accept(event,4)"></div>
+        <div class="division" ondragover="allow(event)" ondrop="accept(event,5)"></div>
+        <div class="division" ondragover="allow(event)" ondrop="accept(event,6)"></div>
+        <div class="division" ondragover="allow(event)" ondrop="accept(event,7)"></div>
+        <div class="division" ondragover="allow(event)" ondrop="accept(event,8)"></div>
+    </div>
+
+    <img id="img1" class="imggg" draggable="true" ondragstart="copy(event)" src="1.jpg" alt="">
+    <img id="img2" class="imggg" draggable="true" ondragstart="copy(event)" src="2.jpg" alt="">
+    <img id="img3" class="imggg" draggable="true" ondragstart="copy(event)" src="3.jpg" alt="">
+    <img id="img4" class="imggg" draggable="true" ondragstart="copy(event)" src="4.jpg" alt="">
+    <img id="img5" class="imggg" draggable="true" ondragstart="copy(event)" src="5.jpg" alt="">
+    <img id="img6" class="imggg" draggable="true" ondragstart="copy(event)" src="6.jpg" alt="">
+    <img id="img7" class="imggg" draggable="true" ondragstart="copy(event)" src="7.jpg" alt="">
+    <img id="img8" class="imggg" draggable="true" ondragstart="copy(event)" src="8.jpg" alt="">
+    <img id="img9" class="imggg" draggable="true" ondragstart="copy(event)" src="9.jpg" alt="">
+
+</body>
+
+</html>
